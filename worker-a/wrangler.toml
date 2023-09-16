@@ -1,0 +1,9 @@
+name = "worker_do_otel_a"
+main = "./index.ts"
+compatibility_date = "2023-08-05"
+compatibility_flags = [ "nodejs_compat" ]
+minify = true
+
+services = [
+  { binding = "WORKER_B", service = "worker_do_otel_b" }
+]

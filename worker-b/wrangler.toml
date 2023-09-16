@@ -1,0 +1,13 @@
+name = "worker_do_otel_b"
+main = "./index.ts"
+compatibility_date = "2023-08-05"
+compatibility_flags = [ "nodejs_compat" ]
+minify = true
+
+[[durable_objects.bindings]]
+name = "COUNTER"
+class_name = "Counter"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["Counter"]
