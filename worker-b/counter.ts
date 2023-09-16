@@ -31,6 +31,6 @@ class Counter implements DurableObject {
   }
 }
 
+// export { Counter }
 const InstrumentedCounter = instrumentDO(Counter)
-
 export { InstrumentedCounter as Counter }

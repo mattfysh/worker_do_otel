@@ -3,28 +3,43 @@ import { instrument } from './trace'
 
 export { Counter } from './counter'
 
-async function fetch(request: Request, env: Env) {
+async function fetch(request: Request, env: Env, context: ExecutionContext) {
   console.log(
     'Worker B received headers',
     Object.fromEntries(request.headers.entries())
   )
   let url = new URL(request.url)
+  let idparam = url.searchParams.get('id')
   let name = url.searchParams.get('name')
-  if (!name) {
-    return new Response(
-      'Select a Durable Object to contact by using' +
-        ' the `name` URL query string parameter. e.g. ?name=A'
-    )
-  }
 
-  let id = env.COUNTER.idFromName(name)
+  console.log('xx', { idparam, name })
+
+  let id
+  if (name) {
+    id = env.COUNTER.idFromName(name)
+  } else if (idparam) {
+    id = env.COUNTER.idFromString(idparam)
+  } else {
+    id = env.COUNTER.newUniqueId()
+  }
 
   let obj = env.COUNTER.get(id)
 
   let res = await obj.fetch(request.url)
   let count = parseInt(await res.text())
 
-  return new Response(`Durable Object '${name}' ${count}`)
+  return new Response(
+    JSON.stringify({
+      id: obj.id.toString(),
+      message: `Durable Object -- ${count}`,
+    }),
+    {
+      headers: {
+        'content-type': 'application/json',
+      },
+    }
+  )
 }
 
+// export default { fetch }
 export default instrument({ fetch })

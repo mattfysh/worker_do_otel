@@ -1,9 +1,6 @@
 # todo
 
-- propagate worker A -> worker B
-- inspect honeycomb spans
-- setAlarm
-
+- make spans for req 2 + 3 show up
 
 # setup
 
