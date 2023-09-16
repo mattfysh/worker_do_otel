@@ -1,13 +1,13 @@
 import type { Env } from './types'
-import { instrument } from './trace'
+// import { instrument } from './trace'
 
 export { Counter } from './counter'
 
 async function fetch(request: Request, env: Env, context: ExecutionContext) {
-  console.log(
-    'Worker B received headers',
-    Object.fromEntries(request.headers.entries())
-  )
+  // console.log(
+  //   'Worker B received headers',
+  //   Object.fromEntries(request.headers.entries())
+  // )
   let url = new URL(request.url)
   let idparam = url.searchParams.get('id')
   let name = url.searchParams.get('name')
@@ -25,21 +25,31 @@ async function fetch(request: Request, env: Env, context: ExecutionContext) {
 
   let obj = env.COUNTER.get(id)
 
-  let res = await obj.fetch(request.url)
-  let count = parseInt(await res.text())
+  return obj.fetch(request.url)
 
-  return new Response(
-    JSON.stringify({
-      id: obj.id.toString(),
-      message: `Durable Object -- ${count}`,
-    }),
-    {
-      headers: {
-        'content-type': 'application/json',
-      },
-    }
-  )
+  // let res = await obj.fetch(request.url)
+  // let count = parseInt(await res.text())
+
+  // return new Response(
+  //   JSON.stringify({
+  //     id: obj.id.toString(),
+  //     message: `Durable Object -- ${count}`,
+  //   }),
+  //   {
+  //     headers: {
+  //       'content-type': 'application/json',
+  //     },
+  //   }
+  // )
 }
 
-// export default { fetch }
-export default instrument({ fetch })
+export default { fetch }
+// export default instrument({ fetch })
+
+class Greet {
+  fetch() {
+    return new Response('hello from do')
+  }
+}
+
+export { Greet }

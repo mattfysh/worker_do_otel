@@ -1,16 +1,17 @@
-import { instrumentDO } from './trace'
+// import { instrumentDO } from './trace'
 
 class Counter implements DurableObject {
-  private state: DurableObjectState
+  // private state: DurableObjectState
 
   constructor(state: DurableObjectState) {
-    this.state = state
+    // this.state = state
   }
 
-  async fetch(request: Request) {
+  fetch(request: Request) {
     let url = new URL(request.url)
 
-    let value: number = (await this.state.storage.get('value')) || 0
+    let value = 0
+    // let value: number = (await this.state.storage.get('value')) || 0
     switch (url.pathname) {
       case '/increment':
         ++value
@@ -25,12 +26,12 @@ class Counter implements DurableObject {
         return new Response('Not found', { status: 404 })
     }
 
-    await this.state.storage.put('value', value)
+    // await this.state.storage.put('value', value)
 
     return new Response(value.toString())
   }
 }
 
-// export { Counter }
-const InstrumentedCounter = instrumentDO(Counter)
-export { InstrumentedCounter as Counter }
+export { Counter }
+// const InstrumentedCounter = instrumentDO(Counter)
+// export { InstrumentedCounter as Counter }

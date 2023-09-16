@@ -1,28 +1,19 @@
-# todo
+# issues
 
-- make spans for req 2 + 3 show up
+* rc.12 `isFetcher` throws an error
+* manually patched rc.12, service binding is still not auto-instrumented
+
+make spans for req 2 + 3 show up
 
 # setup
 
 ```
 pnpm install
-```
-
-## 1. Worker B + D/O
-
-```
-cd worker-b
+cd worker-$letter
 wrangler deploy
-wrangler secret put HONEYCOMB_API_KEY
+(optional) wrangler secret put HONEYCOMB_API_KEY
 ```
 
-## 2. Worker A
-
-```
-cd worker-a
-wrangler deploy
-wrangler secret put HONEYCOMB_API_KEY
-```
 
 
 # run

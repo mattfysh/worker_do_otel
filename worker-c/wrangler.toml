@@ -1,24 +1,13 @@
-name = "worker_do_otel_b"
+name = "worker_do_otel_c"
 main = "./index.ts"
 compatibility_date = "2023-08-05"
 compatibility_flags = [ "nodejs_compat" ]
 minify = true
-
-
-[[durable_objects.bindings]]
-name = "COUNTER"
-class_name = "Counter"
-
-[[migrations]]
-tag = "v1"
-new_classes = ["Counter"]
-
-
 
 [[durable_objects.bindings]]
 name = "GREET"
 class_name = "Greet"
 
 [[migrations]]
-tag = "v2"
+tag = "v1"
 new_classes = ["Greet"]

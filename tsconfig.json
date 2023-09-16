@@ -11,6 +11,6 @@
     "esModuleInterop": true,
     "types": ["@cloudflare/workers-types"]
   },
-  "include": ["worker-a", "worker-b"],
+  "include": ["worker-a", "worker-b", "worker-c"],
   "exclude": ["node_modules", "dist"]
 }
