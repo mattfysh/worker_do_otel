@@ -36,12 +36,6 @@ async function fetch(req: Request, env: Env) {
 export default { fetch }
 
 export class Greet {
-  private t: ReturnType<typeof timer>
-
-  constructor() {
-    this.t = timer()
-  }
-
   fetch() {
     return new Response('hello from do')
   }
