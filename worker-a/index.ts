@@ -4,9 +4,9 @@ import { instrument, trace } from './trace'
 
 const INSTRUMENT_SERVICE_BINDING = true
 
-async function fetch(request: Request, env: Env) {
+async function fetch(req: Request, env: Env) {
   function doReq(index: number, id?: string) {
-    let url = new URL(request.url)
+    const url = new URL(req.url)
     if (id) {
       url.searchParams.set('id', id)
     }
