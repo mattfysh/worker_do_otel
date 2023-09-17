@@ -28,7 +28,7 @@ async function fetch(req: Request, env: Env) {
   const msg = await obj.fetch(req.url)
   t.log('Greet responded')
 
-  const body = { id: id.toString(), msg: msg }
+  const body = { id: id.toString(), msg: await msg.text() }
   const headers = { 'content-type': 'application/json' }
   return new Response(JSON.stringify(body), { headers })
 }

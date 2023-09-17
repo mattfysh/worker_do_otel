@@ -17,7 +17,7 @@ async function fetch(req: Request, env: Env) {
         propagation.inject(context.active(), headers)
       }
       const res = await env.WORKER_B.fetch(url.toString(), { headers })
-      return res.json() as unknown as { id: string; message: string }
+      return res.json() as unknown as { id: string; msg: string }
     })
   }
 

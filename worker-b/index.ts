@@ -4,7 +4,7 @@ import { instrument } from './trace'
 export { Counter } from './counter'
 export { Greet } from './greet'
 
-async function fetch(req: Request, env: Env, context: ExecutionContext) {
+async function fetch(req: Request, env: Env) {
   const url = new URL(req.url)
   const idparam = url.searchParams.get('id')
   const name = url.searchParams.get('name')
@@ -24,9 +24,9 @@ async function fetch(req: Request, env: Env, context: ExecutionContext) {
 
   const msg = await obj.fetch(req.url)
 
-  const body = { id: id.toString(), msg: msg }
+  const body = { id: id.toString(), msg: await msg.text() }
   const headers = { 'content-type': 'application/json' }
   return new Response(JSON.stringify(body), { headers })
 }
 
-export default { fetch }
+export default instrument({ fetch })
