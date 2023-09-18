@@ -4,18 +4,13 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  '@microlabs/otel-cf-workers@1.0.0-rc.12':
-    hash: dsl3ue2m5rzzqqunpih4h2wvlm
-    path: patches/@microlabs__otel-cf-workers@1.0.0-rc.12.patch
-
 dependencies:
   '@cloudflare/workers-types':
     specifier: ^4.20230914.0
     version: 4.20230914.0
   '@microlabs/otel-cf-workers':
-    specifier: 1.0.0-rc.12
-    version: 1.0.0-rc.12(patch_hash=dsl3ue2m5rzzqqunpih4h2wvlm)
+    specifier: 1.0.0-rc.13
+    version: 1.0.0-rc.13
   '@opentelemetry/api':
     specifier: ^1.6.0
     version: 1.6.0
@@ -296,8 +291,8 @@ packages:
     dev: false
     optional: true
 
-  /@microlabs/otel-cf-workers@1.0.0-rc.12(patch_hash=dsl3ue2m5rzzqqunpih4h2wvlm):
-    resolution: {integrity: sha512-0FeP/LEKCkT9PkIN3dEWBMBPgS3uyDE2+kOZaeHEA8aIYqCDHSlsUO7EnpsJ25zvxRWjPpTWYRSbdolu2YiUUQ==}
+  /@microlabs/otel-cf-workers@1.0.0-rc.13:
+    resolution: {integrity: sha512-nfy2IxScaPoPLLlxl2GVPfFHEgxStlnZzE6KiWtCsCcowRrtN1TdrsDHsuquGWlLhmJxbkokq2LBZZs25o+9zQ==}
     dependencies:
       '@opentelemetry/api': 1.6.0
       '@opentelemetry/core': 1.17.0(@opentelemetry/api@1.6.0)
@@ -310,7 +305,6 @@ packages:
       deepmerge: 4.3.1
       ts-checked-fsm: 1.1.0
     dev: false
-    patched: true
 
   /@opentelemetry/api@1.6.0:
     resolution: {integrity: sha512-OWlrQAnWn9577PhVgqjUvMr1pg57Bc4jv0iL4w0PRuOSRvq67rvHW9Ie/dZVMvCzhSCB+UxhcY/PmCmFj33Q+g==}

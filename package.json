@@ -18,13 +18,8 @@
   },
   "dependencies": {
     "@cloudflare/workers-types": "^4.20230914.0",
-    "@microlabs/otel-cf-workers": "1.0.0-rc.12",
+    "@microlabs/otel-cf-workers": "1.0.0-rc.13",
     "@opentelemetry/api": "^1.6.0",
     "wrangler": "^3.8.0"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "@microlabs/otel-cf-workers@1.0.0-rc.12": "patches/@microlabs__otel-cf-workers@1.0.0-rc.12.patch"
-    }
   }
 }

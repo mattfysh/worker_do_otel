@@ -2,7 +2,7 @@ import { context, propagation } from '@opentelemetry/api'
 import type { Env } from './types'
 import { instrument, trace } from './trace'
 
-const INSTRUMENT_SERVICE_BINDING = true
+const INSTRUMENT_SERVICE_BINDING = false
 
 async function fetch(req: Request, env: Env) {
   function doReq(index: number, id?: string) {
