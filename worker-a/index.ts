@@ -3,6 +3,16 @@ import type { Env } from './types'
 import { instrument, trace } from './trace'
 
 const INSTRUMENT_SERVICE_BINDING = false
+const DELAY = 1000
+
+async function delay() {
+  if (DELAY) {
+    await trace(
+      `delay: ${DELAY}ms`,
+      () => new Promise(resolve => setTimeout(resolve, DELAY))
+    )
+  }
+}
 
 async function fetch(req: Request, env: Env) {
   function doReq(index: number, id?: string) {
@@ -22,9 +32,9 @@ async function fetch(req: Request, env: Env) {
   }
 
   const { id } = await doReq(1)
-
+  await delay()
   await doReq(2, id)
-
+  await delay()
   const last = await doReq(3, id)
   return new Response(JSON.stringify(last))
 }
