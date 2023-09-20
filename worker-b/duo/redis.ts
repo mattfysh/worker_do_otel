@@ -30,7 +30,7 @@ function getClient(addr: string, queue: Queue) {
   }
 }
 
-export function getRedis(addr: string, pass: string) {
+export function getRedis(addr: string, pass: string, hashKey: string) {
   const queue: Queue = []
   const client = getClient(addr, queue)
 
@@ -44,13 +44,22 @@ export function getRedis(addr: string, pass: string) {
 
   send('AUTH', pass)
 
+  let writes = false
+
   return {
+    enableWrites: async () => {
+      await send('WATCH', hashKey)
+      writes = true
+    },
     async get(key: string) {
-      const value = (await send('GET', key)) as null | string
+      const value = (await send('HGET', hashKey, key)) as null | string
       return value === null ? undefined : JSON.parse(value)
     },
     async put(key: string, value: unknown) {
-      await send('SET', key, JSON.stringify(value))
+      if (!writes) {
+        throw new Error('Cannot write')
+      }
+      await send('HSET', hashKey, key, JSON.stringify(value))
       return true
     },
   }
@@ -88,6 +97,8 @@ function parse(buf: any) {
       line = lines[i]
       const str = line.slice(0, len)
       res.push(str)
+    } else if (token === ':') {
+      res.push(parseInt(rem))
     } else {
       throw new Error(`Unknown token: ${token} (${rem})`)
     }

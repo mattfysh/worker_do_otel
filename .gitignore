@@ -1,2 +1,4 @@
 node_modules
 *.log
+todo.md
+cloud/Pulumi.*.yaml

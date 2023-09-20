@@ -1,34 +1,40 @@
-import type { getRedis } from './redis'
+import type { Env } from '../types'
+import { getRedis } from './redis'
+import { routeToHost } from './route'
+import { DuoId } from './id'
 
 export type DurableObjectClass = {
   new (state: DurableObjectState, env: any): DurableObject
 }
 
-export type Redis = ReturnType<typeof getRedis>
-
-class DuoId implements DurableObjectId {
-  constructor(private id: string) {}
-
-  toString() {
-    return this.id
-  }
-
-  equals(other: DurableObjectId) {
-    return this.toString() === other.toString()
+function noimpl(msg: string) {
+  return function () {
+    throw new Error(`Not implemented: ${msg}`)
   }
 }
 
 export function wrapDuo(
+  bindingName: string,
   DO: DurableObjectClass,
-  redis: Redis
+  env: Env,
+  continent?: ContinentCode
 ): DurableObjectNamespace {
+  const defaultHost = routeToHost(env, { continent })
+
   return {
-    newUniqueId: () => new DuoId('newUniqueId'),
+    newUniqueId: () => DuoId.createUnique(defaultHost),
     idFromString: (id: string) => new DuoId(id),
-    idFromName: (name: string) => new DuoId(`IDFOR:${name}`),
-    getExisting: (): any => {},
-    jurisdiction: (): any => {},
-    get: (duoId: DurableObjectId) => {
+
+    idFromName: noimpl('idFromName'),
+    getExisting: noimpl('getExisting'),
+    jurisdiction: noimpl('jurisdiction'),
+
+    get: (duoId: DuoId) => {
+      const host = duoId.getHost(env)
+      const connUrl = new URL(host.conn)
+      const hashKey = `${bindingName}:${duoId}`
+      const redis = getRedis(connUrl.host, connUrl.password, hashKey)
+
       console.log('getting wrapped counter with id', duoId)
       const state: DurableObjectState = {
         id: duoId,
@@ -45,11 +51,10 @@ export function wrapDuo(
             if (Array.isArray(key)) {
               throw new Error('no impl: storage.get(keys)')
             }
-            return redis.get(`${duoId}:${key}`)
+            return redis.get(key)
           },
           async put(key: any, value: unknown) {
-            await redis.put(`${duoId}:${key}`, value)
-            return undefined
+            await redis.put(key, value)
           },
           list: (): any => {},
           delete: (): any => {},

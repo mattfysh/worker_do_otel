@@ -1,3 +1,4 @@
+import './polyfill'
 import type { Env } from './types'
 import { instrument } from './trace'
 import { bindDuo } from './duo'
@@ -33,7 +34,7 @@ async function fetch(req: Request, env: Env) {
 
 let worker: ExportedHandler<Env> = { fetch }
 if (BIND_DUO) {
-  worker = bindDuo(worker, { COUNTER: Counter })
+  worker = bindDuo(worker, { COUNTER: Counter }, { optimistic: true })
 }
 
 export default instrument(worker)
