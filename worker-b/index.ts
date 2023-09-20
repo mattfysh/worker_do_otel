@@ -4,6 +4,10 @@ import { bindDuo } from './duo'
 import { Counter } from './counter'
 import { Greet } from './greet'
 
+export { Counter, Greet }
+
+const BIND_DUO = true
+
 async function fetch(req: Request, env: Env) {
   const url = new URL(req.url)
   const idparam = url.searchParams.get('id')
@@ -27,9 +31,10 @@ async function fetch(req: Request, env: Env) {
   return new Response(JSON.stringify(body), { headers })
 }
 
-const bound = bindDuo({ fetch }, { COUNTER: Counter })
-export default instrument(bound)
+let worker: ExportedHandler<Env> = { fetch }
+if (BIND_DUO) {
+  worker = bindDuo(worker, { COUNTER: Counter })
+}
 
+export default instrument(worker)
 // export default instrument({ fetch })
-
-export { Counter, Greet }
