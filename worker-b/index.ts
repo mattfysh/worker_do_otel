@@ -1,15 +1,13 @@
 import type { Env } from './types'
 import { instrument } from './trace'
-
-export { Counter } from './counter'
-export { Greet } from './greet'
+import { bindDuo } from './duo'
+import { Counter } from './counter'
+import { Greet } from './greet'
 
 async function fetch(req: Request, env: Env) {
   const url = new URL(req.url)
   const idparam = url.searchParams.get('id')
   const name = url.searchParams.get('name')
-
-  console.log('xx', { idparam, name })
 
   let id
   if (name) {
@@ -29,4 +27,9 @@ async function fetch(req: Request, env: Env) {
   return new Response(JSON.stringify(body), { headers })
 }
 
-export default instrument({ fetch })
+const bound = bindDuo({ fetch }, { COUNTER: Counter })
+export default instrument(bound)
+
+// export default instrument({ fetch })
+
+export { Counter, Greet }

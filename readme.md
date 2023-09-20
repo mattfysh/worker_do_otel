@@ -1,11 +1,16 @@
-# issues
+# durable upstash objects (duo)
 
-* rc.12 `isFetcher` throws an error
-  * manually patched rc.12 using `pnpm patch`
-* service binding is still not auto-instrumented
-  * added a flag in `worker-a/index.ts` to control
-* subsequent calls to DO within same parent worker are not instrumented
-* missing spans occur at a highly-reproducible rate
+* optimistic locking
+* pessimistic locking
+* `id:key` string vs `id` hash
+* create pulumi stack, one upstash db per region
+* route `newUniqueId` to closest
+* route `idFromString` to db embedded in id
+* global `idFromName` owner check
+
+# otel issues
+
+* none 🎉
 
 # setup
 

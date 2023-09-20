@@ -3,7 +3,7 @@ import type { Env } from './types'
 import { instrument, trace } from './trace'
 
 const INSTRUMENT_SERVICE_BINDING = false
-const DELAY = 1000
+const DELAY = 0
 
 async function delay() {
   if (DELAY) {
@@ -39,5 +39,4 @@ async function fetch(req: Request, env: Env) {
   return new Response(JSON.stringify(last))
 }
 
-// export default { fetch }
 export default instrument({ fetch })

@@ -9,7 +9,7 @@
     "outDir": "tscOutDir",
     "preserveConstEnums": true,
     "esModuleInterop": true,
-    "types": ["@cloudflare/workers-types"]
+    "types": ["@cloudflare/workers-types", "node"]
   },
   "include": ["worker-a", "worker-b", "worker-c"],
   "exclude": ["node_modules", "dist"]

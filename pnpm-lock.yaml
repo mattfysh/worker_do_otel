@@ -9,11 +9,14 @@ dependencies:
     specifier: ^4.20230914.0
     version: 4.20230914.0
   '@microlabs/otel-cf-workers':
-    specifier: 1.0.0-rc.13
-    version: 1.0.0-rc.13
+    specifier: 1.0.0-rc.14
+    version: 1.0.0-rc.14
   '@opentelemetry/api':
     specifier: ^1.6.0
     version: 1.6.0
+  '@types/node':
+    specifier: ^20.6.3
+    version: 20.6.3
   wrangler:
     specifier: ^3.8.0
     version: 3.8.0
@@ -291,8 +294,8 @@ packages:
     dev: false
     optional: true
 
-  /@microlabs/otel-cf-workers@1.0.0-rc.13:
-    resolution: {integrity: sha512-nfy2IxScaPoPLLlxl2GVPfFHEgxStlnZzE6KiWtCsCcowRrtN1TdrsDHsuquGWlLhmJxbkokq2LBZZs25o+9zQ==}
+  /@microlabs/otel-cf-workers@1.0.0-rc.14:
+    resolution: {integrity: sha512-+qEnl6qECl2PLtAPO0Oj7sCmSrTe5jdwBGNeZxNNCUT/COZQGHlEkre9W3b9YtR86TLRpgn0vylN1ba6gGihBg==}
     dependencies:
       '@opentelemetry/api': 1.6.0
       '@opentelemetry/core': 1.17.0(@opentelemetry/api@1.6.0)
@@ -434,6 +437,10 @@ packages:
   /@opentelemetry/semantic-conventions@1.17.0:
     resolution: {integrity: sha512-+fguCd2d8d2qruk0H0DsCEy2CTK3t0Tugg7MhZ/UQMvmewbZLNnJ6heSYyzIZWG5IPfAXzoj4f4F/qpM7l4VBA==}
     engines: {node: '>=14'}
+    dev: false
+
+  /@types/node@20.6.3:
+    resolution: {integrity: sha512-HksnYH4Ljr4VQgEy2lTStbCKv/P590tmPe5HqOnv9Gprffgv5WXAY+Y5Gqniu0GGqeTCUdBnzC3QSrzPkBkAMA==}
     dev: false
 
   /acorn-walk@8.2.0:
@@ -781,7 +788,7 @@ packages:
       stoppable: 1.1.0
       undici: 5.24.0
       workerd: 1.20230904.0
-      ws: 8.14.1
+      ws: 8.14.2
       youch: 3.3.1
       zod: 3.22.2
     transitivePeerDependencies:
@@ -1101,8 +1108,8 @@ packages:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: false
 
-  /ws@8.14.1:
-    resolution: {integrity: sha512-4OOseMUq8AzRBI/7SLMUwO+FEDnguetSk7KMb1sHwvF2w2Wv5Hoj0nlifx8vtGsftE/jWHojPy8sMMzYLJ2G/A==}
+  /ws@8.14.2:
+    resolution: {integrity: sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
