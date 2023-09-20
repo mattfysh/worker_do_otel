@@ -1,9 +1,30 @@
+import { trace as otel, SpanStatusCode } from '@opentelemetry/api'
 import type { ResolveConfigFn } from '@microlabs/otel-cf-workers'
 import {
   instrument as i,
   instrumentDO as iDO,
 } from '@microlabs/otel-cf-workers'
 import type { Env } from './types'
+
+export function trace<Return>(
+  name: string,
+  fn: () => Return | Promise<Return>
+): Promise<Return> {
+  const tracer = otel.getTracer('topline')
+  return tracer.startActiveSpan(name, async span => {
+    try {
+      return await fn()
+    } catch (e: any) {
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: e?.message,
+      })
+      throw e
+    } finally {
+      span.end()
+    }
+  })
+}
 
 const config: ResolveConfigFn = (env: Env) => {
   const service = { name: 'worker-b' }

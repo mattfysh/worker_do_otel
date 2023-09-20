@@ -2,27 +2,29 @@ import type { Env } from '../types'
 import { getRedis } from './redis'
 import { routeToHost } from './route'
 import { DuoId } from './id'
+import { wrapStorage } from './storage'
+import { noimpl } from './utils'
 
 export type DurableObjectClass = {
   new (state: DurableObjectState, env: any): DurableObject
 }
 
-function noimpl(msg: string) {
-  return function () {
-    throw new Error(`Not implemented: ${msg}`)
-  }
-}
+export type Options = Partial<{
+  optimistic: boolean
+}>
 
 export function wrapDuo(
   bindingName: string,
   DO: DurableObjectClass,
   env: Env,
-  continent?: ContinentCode
+  continent?: ContinentCode,
+  opts: Options = {}
 ): DurableObjectNamespace {
   const defaultHost = routeToHost(env, { continent })
 
   return {
     newUniqueId: () => DuoId.createUnique(defaultHost),
+
     idFromString: (id: string) => new DuoId(id),
 
     idFromName: noimpl('idFromName'),
@@ -34,8 +36,8 @@ export function wrapDuo(
       const connUrl = new URL(host.conn)
       const hashKey = `${bindingName}:${duoId}`
       const redis = getRedis(connUrl.host, connUrl.password, hashKey)
+      const { storeControl, storage } = wrapStorage(redis)
 
-      console.log('getting wrapped counter with id', duoId)
       const state: DurableObjectState = {
         id: duoId,
         waitUntil: (): any => {},
@@ -46,37 +48,49 @@ export function wrapDuo(
         getWebSocketAutoResponse: (): any => {},
         getWebSocketAutoResponseTimestamp: (): any => {},
         abort: (): any => {},
-        storage: {
-          async get(key: string | string[]) {
-            if (Array.isArray(key)) {
-              throw new Error('no impl: storage.get(keys)')
-            }
-            return redis.get(key)
-          },
-          async put(key: any, value: unknown) {
-            await redis.put(key, value)
-          },
-          list: (): any => {},
-          delete: (): any => {},
-          deleteAll: (): any => {},
-          transaction: (): any => {},
-          setAlarm: (): any => {},
-          getAlarm: (): any => {},
-          deleteAlarm: (): any => {},
-          sync: (): any => {},
-          sql: {} as any,
-          transactionSync: (): any => {},
-          getCurrentBookmark: (): any => {},
-          getBookmarkForTime: (): any => {},
-          onNextSessionRestoreBookmark: (): any => {},
-        },
+        storage,
       }
-      const stub = new DO(state, {})
+
+      async function fetch(req: Request) {
+        if (opts.optimistic) {
+          // optimistic readonly
+          try {
+            const stub = new DO(state, {})
+            return await stub.fetch(new Request(req))
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e)
+            console.error('optimistic read failure:', msg)
+            if (msg !== 'Writes disabled') {
+              return new Response('Internal Server Error', { status: 500 })
+            }
+          }
+
+          // optimistic write locking (x2)
+          for (let i = 0; i < 2; i += 1) {
+            const exec = storeControl.optimisticLock()
+            try {
+              const stub = new DO(state, {})
+              const res = await stub.fetch(new Request(req))
+              await exec()
+              return res
+            } catch (e) {
+              const msg = e instanceof Error ? e.message : String(e)
+              console.error('optimistic write locking failure:', msg)
+              if (msg !== 'Exec failed') {
+                return new Response('Internal Server Error', { status: 500 })
+              }
+            }
+          }
+        }
+
+        return new Response('Not implemented: pessimistic write locking', {
+          status: 500,
+        })
+      }
+
       return {
         id: duoId,
-        async fetch(req: Request) {
-          return stub.fetch(new Request(req))
-        },
+        fetch,
         connect: (): any => {},
         queue: (): any => {},
         scheduled: (): any => {},

@@ -2,6 +2,7 @@ import { Buffer } from 'node:buffer'
 import { connect } from 'cloudflare:sockets'
 
 type Queue = ReturnType<(typeof Promise)['withResolvers']>[]
+export type Redis = ReturnType<typeof getRedis>
 
 function getClient(addr: string, queue: Queue) {
   const socket = connect(addr, { secureTransport: 'on', allowHalfOpen: false })
@@ -10,7 +11,16 @@ function getClient(addr: string, queue: Queue) {
 
   setTimeout(async () => {
     for await (const chunk of socket.readable) {
-      parse(chunk).forEach(x => {
+      let responses
+
+      try {
+        responses = parse(chunk)
+      } catch (e) {
+        queue[0]?.reject(e)
+        break
+      }
+
+      responses.forEach(x => {
         const nextCmd = queue.shift()
         if (nextCmd) {
           nextCmd.resolve(x)
@@ -35,6 +45,9 @@ export function getRedis(addr: string, pass: string, hashKey: string) {
   const client = getClient(addr, queue)
 
   async function send(...cmd: string[]): Promise<unknown> {
+    if (cmd[0] !== 'AUTH') {
+      console.log('SENDING:', ...cmd)
+    }
     const resp = build(cmd)
     const p = Promise.withResolvers()
     queue.push(p)
@@ -44,23 +57,22 @@ export function getRedis(addr: string, pass: string, hashKey: string) {
 
   send('AUTH', pass)
 
-  let writes = true
-
   return {
-    enableWrites: async () => {
-      await send('WATCH', hashKey)
-      writes = true
-    },
     async get(key: string) {
       const value = (await send('HGET', hashKey, key)) as null | string
-      return value === null ? undefined : JSON.parse(value)
+      return value === null ? undefined : value
     },
-    async put(key: string, value: unknown) {
-      if (!writes) {
-        throw new Error('Cannot write')
-      }
-      await send('HSET', hashKey, key, JSON.stringify(value))
+    async put(key: string, value: string) {
+      await send('HSET', hashKey, key, value)
       return true
+    },
+    watch() {
+      return send('WATCH', hashKey)
+    },
+    async writeEntries(entries: Record<string, string>) {
+      send('MULTI')
+      send('HSET', hashKey, ...Object.entries(entries).flat())
+      return send('EXEC')
     },
   }
 }
@@ -79,29 +91,46 @@ function parse(buf: any) {
   const resp = Buffer.from(buf).toString()
   const lines = resp.split('\r\n').slice(0, -1)
   const res = []
+
   for (let i = 0; i < lines.length; i++) {
-    let line = lines[i]
-
-    const token = line[0]
-    const rem = line.slice(1)
-
-    if (token === '+') {
-      res.push(rem)
-    } else if (token === '$') {
-      if (rem === '-1') {
-        res.push(null)
-        continue
-      }
-      const len = parseInt(rem)
-      i++
-      line = lines[i]
-      const str = line.slice(0, len)
-      res.push(str)
-    } else if (token === ':') {
-      res.push(parseInt(rem))
-    } else {
-      throw new Error(`Unknown token: ${token} (${rem})`)
-    }
+    const next = () => lines[++i]
+    const value = parseLine(lines[i], next)
+    res.push(value)
   }
   return res
+}
+
+function parseLine(line: string, next: () => string): any {
+  const token = line[0]
+  const rem = line.slice(1)
+
+  switch (token) {
+    case '+':
+      return rem
+
+    case ':':
+      return parseInt(rem)
+
+    case '$': {
+      if (rem === '-1') {
+        return null
+      }
+      const length = parseInt(rem)
+      const str = next()
+      return str.slice(0, length)
+    }
+
+    case '*': {
+      const length = parseInt(rem)
+      const arr = []
+      for (let i = 0; i < length; i++) {
+        const value = parseLine(next(), next)
+        arr.push(value)
+      }
+      return arr
+    }
+
+    default:
+      throw new Error(`Unknown token: ${token} (${rem})`)
+  }
 }

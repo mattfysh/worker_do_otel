@@ -10,7 +10,6 @@ export { Counter, Greet }
 const BIND_DUO = true
 
 async function fetch(req: Request, env: Env) {
-  console.log(JSON.stringify(req.cf))
   const url = new URL(req.url)
   const idparam = url.searchParams.get('id')
   const name = url.searchParams.get('name')
@@ -24,11 +23,15 @@ async function fetch(req: Request, env: Env) {
     id = env.COUNTER.newUniqueId()
   }
 
-  const obj = env.COUNTER.get(id)
+  const stub = env.COUNTER.get(id)
 
-  const msg = await obj.fetch(req.url)
+  const res = await stub.fetch(req.url)
+  if (!res.ok) {
+    console.error(`COUNTER response not ok: ${res.status}`)
+    return new Response('Internal Server Error', { status: 500 })
+  }
 
-  const body = { id: id.toString(), msg: await msg.text() }
+  const body = { id: id.toString(), msg: await res.text() }
   const headers = { 'content-type': 'application/json' }
   return new Response(JSON.stringify(body), { headers })
 }
