@@ -16,18 +16,12 @@ export function bindDuo(
     if (!worker.fetch) {
       throw new Error('Worker must define fetch')
     }
+    const continent = (req.cf?.continent ||
+      req.headers.get('cf-continent')) as ContinentCode
     for (const [name, DO] of Object.entries(bindings)) {
-      Object.assign(env, { [name]: wrapDuo(name, DO, env, req.cf?.continent) })
+      Object.assign(env, { [name]: wrapDuo(name, DO, env, continent) })
     }
-    try {
-      return await worker.fetch(req.clone(), env, ctx)
-    } catch (e) {
-      if (!(e instanceof Error && e.message === 'Cannot write')) {
-        throw e
-      }
-    }
-
-    return new Response('tmp')
+    return await worker.fetch(req.clone(), env, ctx)
   }
 
   return { fetch }

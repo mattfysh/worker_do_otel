@@ -10,6 +10,7 @@ export { Counter, Greet }
 const BIND_DUO = true
 
 async function fetch(req: Request, env: Env) {
+  console.log(JSON.stringify(req.cf))
   const url = new URL(req.url)
   const idparam = url.searchParams.get('id')
   const name = url.searchParams.get('name')

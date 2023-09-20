@@ -28,7 +28,7 @@ export function routeToHost(
   let host: Host | undefined
   if (query.continent) {
     host = continents[query.continent]
-  } else if (query.id) {
+  } else if (typeof query.id === 'number' && query.id !== 0) {
     host = hosts[query.id]
   }
 
@@ -36,5 +36,5 @@ export function routeToHost(
     return host
   }
 
-  throw new Error(`Expected continent code: ${JSON.stringify(query)}`)
+  throw new Error(`Unable to resolve host query: ${JSON.stringify(query)}`)
 }

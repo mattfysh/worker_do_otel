@@ -44,7 +44,7 @@ export function getRedis(addr: string, pass: string, hashKey: string) {
 
   send('AUTH', pass)
 
-  let writes = false
+  let writes = true
 
   return {
     enableWrites: async () => {

@@ -22,7 +22,10 @@ async function fetch(req: Request, env: Env) {
     }
 
     return trace(`make req: ${index}`, async () => {
-      const headers = {}
+      const headers: Record<string, string> = {}
+      if (req.cf?.continent) {
+        headers['cf-continent'] = String(req.cf.continent)
+      }
       if (INSTRUMENT_SERVICE_BINDING) {
         propagation.inject(context.active(), headers)
       }
