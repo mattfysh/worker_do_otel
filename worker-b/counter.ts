@@ -1,4 +1,4 @@
-import { instrumentDO } from './trace'
+// import { instrumentDO } from './trace'
 
 class Counter implements DurableObject {
   private state: DurableObjectState
@@ -31,6 +31,6 @@ class Counter implements DurableObject {
   }
 }
 
-// export { Counter }
-const InstrumentedCounter = instrumentDO(Counter)
-export { InstrumentedCounter as Counter }
+export { Counter }
+// const InstrumentedCounter = instrumentDO(Counter)
+// export { InstrumentedCounter as Counter }

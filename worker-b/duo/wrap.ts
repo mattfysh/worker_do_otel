@@ -66,21 +66,21 @@ export function wrapDuo(
           }
 
           // optimistic write locking (x2)
-          for (let i = 0; i < 2; i += 1) {
-            const exec = storeControl.optimisticLock()
-            try {
-              const stub = new DO(state, {})
-              const res = await stub.fetch(new Request(req))
-              await exec()
-              return res
-            } catch (e) {
-              const msg = e instanceof Error ? e.message : String(e)
-              console.error('optimistic write locking failure:', msg)
-              if (msg !== 'Exec failed') {
-                return new Response('Internal Server Error', { status: 500 })
-              }
-            }
-          }
+          // for (let i = 0; i < 2; i += 1) {
+          //   const exec = storeControl.optimisticLock()
+          //   try {
+          //     const stub = new DO(state, {})
+          //     const res = await stub.fetch(new Request(req))
+          //     await exec()
+          //     return res
+          //   } catch (e) {
+          //     const msg = e instanceof Error ? e.message : String(e)
+          //     console.error('optimistic write locking failure:', msg)
+          //     if (msg !== 'Exec failed') {
+          //       return new Response('Internal Server Error', { status: 500 })
+          //     }
+          //   }
+          // }
         }
 
         return new Response('Not implemented: pessimistic write locking', {

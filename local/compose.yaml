@@ -1,0 +1,17 @@
+services:
+  redis:
+    image: redis
+
+  cf:
+    build: ./cf
+    ports:
+      - '7000:7000'
+    volumes:
+      - ./cf/dist/worker.js:/app/worker.js
+    environment:
+      PORT: 7000
+      REDIS_HOST_AU: redis://redis:6379
+      REDIS_HOST_AS: redis://redis:6379
+      REDIS_HOST_EU: redis://redis:6379
+      REDIS_HOST_US: redis://redis:6379
+      HONEYCOMB_API_KEY: ${HONEYCOMB_API_KEY}

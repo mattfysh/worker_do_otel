@@ -2,3 +2,5 @@ node_modules
 *.log
 todo.md
 cloud/Pulumi.*.yaml
+local/cf/.env
+local/cf/dist

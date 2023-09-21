@@ -5,12 +5,17 @@ type Queue = ReturnType<(typeof Promise)['withResolvers']>[]
 export type Redis = ReturnType<typeof getRedis>
 
 function getClient(addr: string, queue: Queue) {
-  const socket = connect(addr, { secureTransport: 'on', allowHalfOpen: false })
+  const useTls = addr !== 'redis:6379'
+  const socket = connect(addr, {
+    secureTransport: useTls ? 'on' : 'off',
+    allowHalfOpen: false,
+  })
   const writer = socket.writable.getWriter()
   const encoder = new TextEncoder()
 
   setTimeout(async () => {
     for await (const chunk of socket.readable) {
+      console.log('CHUNK:', Buffer.from(chunk).toString())
       let responses
 
       try {
@@ -52,10 +57,23 @@ export function getRedis(addr: string, pass: string, hashKey: string) {
     const p = Promise.withResolvers()
     queue.push(p)
     await client.write(resp)
-    return p.promise
+
+    const timer = new Promise((_, reject) => {
+      const timerId = setTimeout(() => {
+        reject(new Error('Operation timed out after 1000ms'))
+      }, 1000)
+
+      p.promise
+        .then(() => clearTimeout(timerId))
+        .catch(() => clearTimeout(timerId))
+    })
+
+    return Promise.race([p.promise, timer])
   }
 
-  send('AUTH', pass)
+  if (pass) {
+    send('AUTH', pass)
+  }
 
   return {
     async get(key: string) {
@@ -110,6 +128,9 @@ function parseLine(line: string, next: () => string): any {
 
     case ':':
       return parseInt(rem)
+
+    case '-':
+      throw new Error(`Redis error: ${rem}`)
 
     case '$': {
       if (rem === '-1') {
