@@ -40,14 +40,16 @@ export function wrapDuo(
 
       const state: DurableObjectState = {
         id: duoId,
-        waitUntil: (): any => {},
-        blockConcurrencyWhile: (): any => {},
-        acceptWebSocket: (): any => {},
-        getWebSockets: (): any => {},
-        setWebSocketAutoResponse: (): any => {},
-        getWebSocketAutoResponse: (): any => {},
-        getWebSocketAutoResponseTimestamp: (): any => {},
-        abort: (): any => {},
+        waitUntil: noimpl('waitUntil'),
+        blockConcurrencyWhile: noimpl('blockConcurrencyWhile'),
+        acceptWebSocket: noimpl('acceptWebSocket'),
+        getWebSockets: noimpl('getWebSockets'),
+        setWebSocketAutoResponse: noimpl('setWebSocketAutoResponse'),
+        getWebSocketAutoResponse: noimpl('getWebSocketAutoResponse'),
+        getWebSocketAutoResponseTimestamp: noimpl(
+          'getWebSocketAutoResponseTimestamp'
+        ),
+        abort: noimpl('abort'),
         storage,
       }
 
