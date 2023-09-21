@@ -15,7 +15,6 @@ function getClient(addr: string, queue: Queue) {
 
   setTimeout(async () => {
     for await (const chunk of socket.readable) {
-      console.log('CHUNK:', Buffer.from(chunk).toString())
       let responses
 
       try {
