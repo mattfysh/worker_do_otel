@@ -20,10 +20,10 @@ export function wrapDuo(
   continent?: ContinentCode,
   opts: Options = {}
 ): DurableObjectNamespace {
-  const defaultHost = routeToHost(env, { continent })
+  const nearestHost = routeToHost(env, { continent })
 
   return {
-    newUniqueId: () => DuoId.createUnique(defaultHost),
+    newUniqueId: () => DuoId.createUnique(nearestHost),
     idFromString: (id: string) => new DuoId(id),
     idFromName: noimpl('idFromName'),
     getExisting: noimpl('getExisting'),
