@@ -24,9 +24,7 @@ export function wrapDuo(
 
   return {
     newUniqueId: () => DuoId.createUnique(defaultHost),
-
     idFromString: (id: string) => new DuoId(id),
-
     idFromName: noimpl('idFromName'),
     getExisting: noimpl('getExisting'),
     jurisdiction: noimpl('jurisdiction'),
@@ -93,9 +91,9 @@ export function wrapDuo(
       return {
         id: duoId,
         fetch,
-        connect: (): any => {},
-        queue: (): any => {},
-        scheduled: (): any => {},
+        connect: noimpl('connect'),
+        queue: noimpl('queue'),
+        scheduled: noimpl('scheduled'),
       }
     },
   }
